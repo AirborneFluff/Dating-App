@@ -1,1 +1,9 @@
-<p>member-list works!</p>
+<ng-container>
+    <h1 class="text-center">Members</h1>
+    <button (click)="getUsers()">Click me</button>
+    <div class="row mt-5" *ngIf="members.length > 0">
+        <ul>
+            <li *ngFor="let member of members">{{member.username}}</li>
+        </ul>
+    </div>
+</ng-container>

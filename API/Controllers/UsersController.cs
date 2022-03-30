@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.DTOs;
 using API.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,8 @@ namespace API.Controllers
             _context = context;
         }
 
+        [Authorize]
         [HttpGet]
-        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
@@ -31,6 +32,21 @@ namespace API.Controllers
         public async Task<ActionResult<AppUser>> GetUser(int id)
         {
             return await _context.Users.FindAsync(id);
+        }
+
+        [HttpGet("public")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<PublicMemeberDto>>> GetMembers()
+        {
+            var members = await _context.Users.ToListAsync();
+
+            var memberPublicDtos = members.Select(user => {
+                return new PublicMemeberDto() {
+                    Username = user.UserName,
+                };
+            });
+
+            return memberPublicDtos.ToList();
         }
 
         /*
