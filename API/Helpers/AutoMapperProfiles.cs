@@ -16,6 +16,7 @@ namespace API.Helpers
                             x => x.IsMain).Url));
             CreateMap<Photo, PhotoDto>();
             CreateMap<MemberUpdateDto, AppUser>();
+            CreateMap<RegisterDto, AppUser>();
         }
     }
 }
