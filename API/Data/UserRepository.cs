@@ -24,9 +24,10 @@ namespace API.Data
         }
         public async Task<AppUser> GetUserByUsernameAsync(string username)
         {
+            var normalizedUsername = username.ToUpper();
             return await _context.Users
                 .Include(p => p.Photos)
-                .SingleOrDefaultAsync(x => x.UserName.ToLower() == username.ToLower());
+                .SingleOrDefaultAsync(x => x.NormalizedUserName == normalizedUsername);
         }
         public async Task<IEnumerable<AppUser>> GetUsersAsync()
         {
@@ -44,8 +45,9 @@ namespace API.Data
         }
         public async Task<MemberDto> GetMemberByUsernameAsync(string username)
         {
+            var normalizedUsername = username.ToUpper();
             return await _context.Users
-                .Where(x => x.UserName.ToLower() == username.ToLower())
+                .Where(x => x.NormalizedUserName == normalizedUsername)
                 .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
                 .SingleOrDefaultAsync();
         }
@@ -53,7 +55,7 @@ namespace API.Data
         {
             var query = _context.Users.AsQueryable();
 
-            query = query.Where(x => x.UserName != userParams.CurrentUsername);
+            query = query.Where(x => x.NormalizedUserName != userParams.CurrentUsername.ToUpper());
             query = query.Where(x => x.Gender == userParams.Gender);
 
             var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
