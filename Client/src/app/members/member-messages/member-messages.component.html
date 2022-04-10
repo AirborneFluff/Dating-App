@@ -1,0 +1,50 @@
+<div class="card">
+    <div class="card-body">
+        <div *ngIf="messages?.length === 0">It's a bit empty in here... Why not say hello?</div>
+
+        <ul *ngIf="messages?.length > 0" class="chat">
+            <li *ngFor="let message of messages; index as i; last as isLast, first as isFirst">
+                    <span [ngClass]="message.senderUsername !== username ? 'float-right' : 'float-left'"
+                        class="chat-img" *ngIf="messages[i - 1]?.senderUsername !== message.senderUsername">
+                        <img class="rounded-circle" src="{{message.senderPhotoUrl || './assets/user.png'}}"
+                        alt="{{message.senderUsername}}">
+                    </span>
+                    <div class="chat-body"
+                        [ngClass]="[message.senderUsername !== username ? 'text-right' : 'text-left',
+                        messages[i + 1]?.senderUsername !== message.senderUsername || isLast ? 'chat-last' : '']">                        
+                        <small class="text-muted"
+                        [ngClass]="message.senderUsername !== username ? 'text-right' : 'text-left'"
+                        *ngIf="messages[i - 1]?.senderUsername !== message.senderUsername">
+                            <span class="fa fa-clock-o">  {{message.messageSent | timeago}}</span>
+                        </small>
+                        <div class="chat-content">{{message.content}}</div>
+                        <small class="text-muted"
+                            *ngIf="isLast && message.recipientUsername === username">
+                            <span *ngIf="!message.dateRead">
+                                <i class="fa fa-ellipsis-h"></i>
+                            </span>
+                            <span *ngIf="message.dateRead && message.senderUsername !== username">
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                <img class="rounded-circle read-head" src="{{message.recipientPhotoUrl || './assets/user.png'}}"
+                                alt="{{message.senderUsername}}">
+                            </span>
+                        </small>
+                    </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-footer">
+        <form #messageForm="ngForm" (ngSubmit)="sendMessage()" autocomplete="off">
+            <div class="input-group">
+                <input 
+                    name="messageContent"
+                    required
+                    [(ngModel)]="messageContent" type="text" class="form-control input-sm" placeholder="Send a private message">
+                <div class="input-group-append">
+                    <button [disabled]="!messageForm.valid" class="btn btn-primary" type="submit">Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

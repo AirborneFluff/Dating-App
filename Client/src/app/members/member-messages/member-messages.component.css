@@ -1,0 +1,28 @@
+.chat {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.chat-body {
+    padding-inline: 60px;
+}
+
+.chat-img {
+    padding-bottom: 10px;
+}
+
+.chat-last {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dotted #000;
+}
+
+.rounded-circle {
+    max-height: 50px;
+}
+
+.read-head {
+    margin-inline: 5px;
+    max-height: 20px;
+}
