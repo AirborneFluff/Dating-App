@@ -469,3 +469,6 @@ StudentAssets/snippets/utc-datacontext-snippet.txt
 API/appsettings.json
 API/WeatherForecast.cs
 API/Controllers/WeatherForecastController.cs
+API/datingapp.db
+API/datingapp.db-shm
+API/datingapp.db-wal
