@@ -10,10 +10,13 @@
                         alt="{{message.senderUsername}}">
                     </span>
                     <div class="chat-body"
-                        [ngClass]="[message.senderUsername !== username ? 'text-right' : 'text-left',
-                        messages[i + 1]?.senderUsername !== message.senderUsername || isLast ? 'chat-last' : '']">                        
+                    [ngClass]=" messages[i - 1]?.senderUsername !== message.senderUsername && messages[i + 1]?.senderUsername !== message.senderUsername ? 'chat-single' :
+                                messages[i - 1]?.senderUsername !== message.senderUsername && messages[i + 1]?.senderUsername === message.senderUsername ? 'chat-first' :
+                                messages[i - 1]?.senderUsername === message.senderUsername && messages[i + 1]?.senderUsername !== message.senderUsername ? 'chat-last' : 'chat-centre'">             
+                        <div 
+                        [ngClass]="message.senderUsername !== username ? 'text-right' : 'text-left'">                        
                         <small class="text-muted"
-                        [ngClass]="message.senderUsername !== username ? 'text-right' : 'text-left'"
+                        
                         *ngIf="messages[i - 1]?.senderUsername !== message.senderUsername">
                             <span class="fa fa-clock-o">  {{message.messageSent | timeago}}</span>
                         </small>
@@ -30,6 +33,7 @@
                             </span>
                         </small>
                     </div>
+                </div>
             </li>
         </ul>
     </div>

@@ -14,7 +14,11 @@
                 </div>
                 <div>
                     <strong>Last active:</strong>
-                    <p>{{member.lastActive | timeago}}</p>
+                    <p *ngIf="(pressence.onlineUsers$ | async).includes(member.username)" style="color: green;">
+                        <i class="fa fa-circle-o-notch fa-spin"></i>
+                        Online now
+                    </p>
+                    <p *ngIf="!(pressence.onlineUsers$ | async).includes(member.username)">{{member.lastActive | timeago}}</p>
                 </div>
                 <div>
                     <strong>Member since:</strong>
@@ -46,7 +50,7 @@
                 <p>Photos here</p>
             </tab>
             <tab heading="Messages" (selectTab)="onTabActivated($event)">
-                <app-member-messages [messages]="messages" [username]="this.member.username"></app-member-messages>
+                <app-member-messages [username]="this.member.username" [messages]="(messageService.messageThread$ | async).reverse()"></app-member-messages>
             </tab>
         </tabset>
     </div>

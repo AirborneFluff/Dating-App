@@ -5,17 +5,11 @@
 }
 
 .chat-body {
-    padding-inline: 60px;
+    margin-inline: 60px;
 }
 
 .chat-img {
-    padding-bottom: 10px;
-}
-
-.chat-last {
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px dotted #000;
+    padding-block: 10px;
 }
 
 .rounded-circle {
@@ -25,4 +19,20 @@
 .read-head {
     margin-inline: 5px;
     max-height: 20px;
+}
+
+.chat-single {
+    padding-block: 10px;
+    border-bottom: 1px solid rgb(200, 200, 200);
+}
+.chat-first {
+    padding-top: 10px;
+}
+.chat-last {
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgb(200, 200, 200);
+}
+.chat-final {
+    padding-block: 10px;
+    border: 0px;
 }

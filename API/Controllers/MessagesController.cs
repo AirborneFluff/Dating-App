@@ -88,5 +88,21 @@ namespace API.Controllers
 
             return BadRequest("Problem deleting the message");
         }
+
+        [Authorize(Policy = "RequireAdminRole")]
+        [HttpDelete("all/{username}")]
+        public async Task<ActionResult> DeleteUserMessages(string username)
+        {
+            var user = await _userRepository.GetMemberByUsernameAsync(username);
+            if (user == null) return BadRequest("No user found");
+            var messages = await _messageRepository.GetAllMessagesFromUser(username);
+            if (messages == null) return NotFound("No messages have been sent from this user");
+
+            _messageRepository.DeleteMessages(messages.ToArray());
+
+            if (await _messageRepository.SaveAllAsync()) return Ok();
+
+            return BadRequest("Error deleting user's messages");
+        }
     }
 }

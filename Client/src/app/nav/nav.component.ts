@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { User } from '../_models/user';
 import { AccountService } from '../_services/account.service';
+import { MessageService } from '../_services/message.service';
 
 @Component({
   selector: 'app-nav',
@@ -15,7 +16,8 @@ export class NavComponent implements OnInit {
 
   constructor(public accountService: AccountService,
     private router: Router,
-    private toastr: ToastrService) { }
+    private toastr: ToastrService,
+    public messageService: MessageService) { }
 
   ngOnInit(): void {
   }
