@@ -9,10 +9,10 @@ namespace API.SingalR
     public class PressenceHub : Hub
     {
         private readonly PressenceTracker _tracker;
-        private readonly IMessageRepository _messageRepository;
-        public PressenceHub(PressenceTracker tracker, IMessageRepository messageRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public PressenceHub(PressenceTracker tracker, IUnitOfWork unitOfWork)
         {
-            this._messageRepository = messageRepository;
+            this._unitOfWork = unitOfWork;
             this._tracker = tracker;
         }
 
@@ -23,10 +23,6 @@ namespace API.SingalR
 
             var currentUsers = await _tracker.GetOnlineUsers();
             await Clients.Caller.SendAsync("GetOnlineUsers", currentUsers);
-
-            var unreadMessageCount = await _messageRepository.GetUnreadMessageCountForUser(Context.User.GetUsername());
-
-            await Clients.Caller.SendAsync("UnreadMessageCount", unreadMessageCount);
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

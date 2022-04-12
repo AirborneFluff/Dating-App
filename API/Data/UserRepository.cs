@@ -35,10 +35,6 @@ namespace API.Data
                 .Include(p => p.Photos)
                 .ToListAsync();
         }
-        public async Task<bool> SaveAllAsync()
-        {
-            return await _context.SaveChangesAsync() > 0;
-        }
         public void Update(AppUser user)
         {
             _context.Entry(user).State = EntityState.Modified;
@@ -72,6 +68,12 @@ namespace API.Data
             var _query = query.ProjectTo<MemberDto>(_mapper.ConfigurationProvider).AsNoTracking();
 
             return await PagedList<MemberDto>.CreateAsync(_query, userParams.PageNumber, userParams.PageSize);
+        }
+
+        public async Task<string> GetUserGender(string username)
+        {
+            return await _context.Users.Where(x => x.UserName == username)
+                .Select(x => x.Gender).FirstOrDefaultAsync();
         }
     }
 }

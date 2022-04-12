@@ -13,14 +13,12 @@ namespace API.Controllers
     [Authorize]
     public class MessagesController : BaseApiController
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IMessageRepository _messageRepository;
         private readonly IMapper _mapper;
-        public MessagesController(IUserRepository userRepository, IMessageRepository messageRepository, IMapper mapper)
+        private readonly IUnitOfWork _unitOfWork;
+        public MessagesController(IMapper mapper, IUnitOfWork unitOfWork)
         {
+            this._unitOfWork = unitOfWork;
             this._mapper = mapper;
-            this._messageRepository = messageRepository;
-            this._userRepository = userRepository;
         }
 
         [HttpPost]
@@ -30,12 +28,12 @@ namespace API.Controllers
             if (username.ToLower() == createMessageDto.RecipientUsername.ToLower())
                 return BadRequest("You cannot message yourself");
 
-            var sender = await _userRepository.GetUserByUsernameAsync(username);
-            var recipient = await _userRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
+            var sender = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+            var recipient = await _unitOfWork.UserRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
 
             if (recipient == null) return NotFound();
 
-            if(string.IsNullOrWhiteSpace(createMessageDto.Content)) return BadRequest("No message content sent");
+            if (string.IsNullOrWhiteSpace(createMessageDto.Content)) return BadRequest("No message content sent");
 
             var newMessage = new Message
             {
@@ -46,8 +44,8 @@ namespace API.Controllers
                 Content = createMessageDto.Content
             };
 
-            _messageRepository.AddMessage(newMessage);
-            if (await _messageRepository.SaveAllAsync()) return Ok(_mapper.Map<MessageDto>(newMessage));
+            _unitOfWork.MessageRepository.AddMessage(newMessage);
+            if (await _unitOfWork.Complete()) return Ok(_mapper.Map<MessageDto>(newMessage));
 
             return BadRequest("Failed to send message");
         }
@@ -56,25 +54,19 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessagesForUser([FromQuery] MessageParams messageParams)
         {
             messageParams.Username = User.GetUsername();
-            var messages = await _messageRepository.GetMessagesForUser(messageParams);
+            var messages = await _unitOfWork.MessageRepository.GetMessagesForUser(messageParams);
 
             Response.AddPaginationHeader(messages.CurrentPage, messages.PageSize, messages.TotalCount, messages.TotalPages);
 
             return messages;
         }
 
-        [HttpGet("thread/{username}")]
-        public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageThread(string username)
-        {
-            var currentUsername = User.GetUsername();
-            return Ok(await _messageRepository.GetMessageThread(currentUsername, username));
-        }
-
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteMessage(int id) {
+        public async Task<ActionResult> DeleteMessage(int id)
+        {
             var userId = User.GetUserId();
 
-            var message = await _messageRepository.GetMessage(id);
+            var message = await _unitOfWork.MessageRepository.GetMessage(id);
 
             if (message == null) return NotFound("Message not found");
             if (message.Sender.Id != userId && message.Recipient.Id != userId)
@@ -82,9 +74,9 @@ namespace API.Controllers
 
             if (message.Sender.Id == userId) message.SenderDeleted = true;
             if (message.Recipient.Id == userId) message.RecipientDeleted = true;
-            if (message.RecipientDeleted && message.SenderDeleted) _messageRepository.DeleteMessage(message);
+            if (message.RecipientDeleted && message.SenderDeleted) _unitOfWork.MessageRepository.DeleteMessage(message);
 
-            if (await _messageRepository.SaveAllAsync()) return Ok();
+            if (await _unitOfWork.Complete()) return Ok();
 
             return BadRequest("Problem deleting the message");
         }
@@ -93,14 +85,14 @@ namespace API.Controllers
         [HttpDelete("all/{username}")]
         public async Task<ActionResult> DeleteUserMessages(string username)
         {
-            var user = await _userRepository.GetMemberByUsernameAsync(username);
+            var user = await _unitOfWork.UserRepository.GetMemberByUsernameAsync(username);
             if (user == null) return BadRequest("No user found");
-            var messages = await _messageRepository.GetAllMessagesFromUser(username);
+            var messages = await _unitOfWork.MessageRepository.GetAllMessagesFromUser(username);
             if (messages == null) return NotFound("No messages have been sent from this user");
 
-            _messageRepository.DeleteMessages(messages.ToArray());
+            _unitOfWork.MessageRepository.DeleteMessages(messages.ToArray());
 
-            if (await _messageRepository.SaveAllAsync()) return Ok();
+            if (await _unitOfWork.Complete()) return Ok();
 
             return BadRequest("Error deleting user's messages");
         }

@@ -9,6 +9,5 @@ namespace API.Interfaces
         Task<UserLike> GetUserLikeAsync(int sourceUserId, int likedUserId);
         Task<AppUser> GetUserWithLikesAsync(int userId);
         Task<PagedList<LikeDto>> GetUserLikesAsync(LikeParams likeParams);
-        Task<bool> SaveAllAsync();
     }
 }

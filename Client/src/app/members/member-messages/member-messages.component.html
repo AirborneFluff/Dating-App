@@ -2,7 +2,10 @@
     <div class="card-body">
         <div *ngIf="messages?.length === 0">It's a bit empty in here... Why not say hello?</div>
 
-        <ul *ngIf="messages?.length > 0" class="chat">
+        <ul #scrollMe
+            style="overflow: scroll; height: 500px;"
+            [scrollTop]="scrollMe.scrollHeight"
+            *ngIf="messages?.length > 0" class="chat">
             <li *ngFor="let message of messages; index as i; last as isLast, first as isFirst">
                     <span [ngClass]="message.senderUsername !== username ? 'float-right' : 'float-left'"
                         class="chat-img" *ngIf="messages[i - 1]?.senderUsername !== message.senderUsername">
