@@ -51,7 +51,10 @@ namespace API.Controllers
         [HttpGet("{username}", Name = "GetUser")]
         public async Task<ActionResult<MemberDto>> GetUser(string username)
         {
-            return _mapper.Map<MemberDto>(await _unitOfWork.UserRepository.GetMemberByUsernameAsync(username));
+            var currentUsername = User.GetUsername();
+            var isCurrent = false;
+            if (currentUsername.ToUpper() == username.ToUpper()) isCurrent = true;
+            return _mapper.Map<MemberDto>(await _unitOfWork.UserRepository.GetMemberByUsernameAsync(username, isCurrent));
         }
 
         [HttpPut]
@@ -84,11 +87,6 @@ namespace API.Controllers
                 PublicId = result.PublicId
             };
 
-            if (user.Photos.Count == 0)
-            {
-                photo.IsMain = true;
-            }
-
             user.Photos.Add(photo);
 
             if (await _unitOfWork.Complete())
@@ -105,6 +103,10 @@ namespace API.Controllers
         {
             var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
             var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+
+            if (photo == null) return BadRequest("Photo does not exist");
+
+            if (!photo.IsApproved) return BadRequest("You cannot make an unapproved photo your main photo");
 
             if (photo.IsMain) return BadRequest("This is already your main photo");
 

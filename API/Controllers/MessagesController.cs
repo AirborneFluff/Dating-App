@@ -85,7 +85,7 @@ namespace API.Controllers
         [HttpDelete("all/{username}")]
         public async Task<ActionResult> DeleteUserMessages(string username)
         {
-            var user = await _unitOfWork.UserRepository.GetMemberByUsernameAsync(username);
+            var user = await _unitOfWork.UserRepository.GetMemberByUsernameAsync(username, true);
             if (user == null) return BadRequest("No user found");
             var messages = await _unitOfWork.MessageRepository.GetAllMessagesFromUser(username);
             if (messages == null) return NotFound("No messages have been sent from this user");

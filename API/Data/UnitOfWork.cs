@@ -1,3 +1,4 @@
+using API.Entities;
 using API.Interfaces;
 using AutoMapper;
 
@@ -7,14 +8,17 @@ namespace API.Data
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-        public UnitOfWork(DataContext context, IMapper mapper)
+        private readonly IPhotoService _photoService;
+        public UnitOfWork(DataContext context, IMapper mapper, IPhotoService photoService)
         {
+            this._photoService = photoService;
             this._mapper = mapper;
             this._context = context;
         }
 
         public IUserRepository UserRepository => new UserRepository(_context, _mapper);
         public IMessageRepository MessageRepository => new MessageRepository(_context, _mapper);
+        public IPhotoRepository PhotoRepository => new PhotoRepository(_context, _mapper, _photoService);
         public ILikeRepository LikeRepository => new LikeRepository(_context);
 
         public async Task<bool> Complete()
