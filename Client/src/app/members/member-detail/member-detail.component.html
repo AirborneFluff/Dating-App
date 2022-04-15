@@ -50,7 +50,7 @@
                 <p>Photos here</p>
             </tab>
             <tab heading="Messages" (selectTab)="onTabActivated($event)">
-                <app-member-messages [username]="this.member.username" [messages]="(messageService.messageThread$ | async).reverse()"></app-member-messages>
+                <app-member-messages [username]="this.member.username" [messages]="(messageService.messageThread$ | async)"></app-member-messages>
             </tab>
         </tabset>
     </div>
